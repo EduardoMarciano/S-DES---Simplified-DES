@@ -30,52 +30,45 @@ def P_4(block):
     """
     Performs the P8 permutation on a 4-bit block.
     """
-    return block[1]+block[3]+block[2]+block[0]
+    return [block[1], block[3], block[2], block[0]]
 
 def F(key,block):
     block = EP(key, block)
 
-    row_S0 = (binary_to_decimal(block[0]))+(binary_to_decimal(block[3]))
-    column_S0 = (binary_to_decimal(block[1]))+(binary_to_decimal(block[2]))
-
-    row_S1 = (binary_to_decimal(block[4]))+(binary_to_decimal(block[7]))
-    column_S1 = (binary_to_decimal(block[5]))+(binary_to_decimal(block[6]))
+    row_S0    = (binary_to_decimal(block[0] + block[3]))
+    column_S0 = (binary_to_decimal(block[1] + block[2]))
+    row_S1    = (binary_to_decimal(block[4] + block[7]))
+    column_S1 = (binary_to_decimal(block[5] + block[6]))
     
-    block_p4 = P_4(S0[row_S0][column_S0] + S1[row_S1][column_S1])
-    
-    return block_p4
+    return P_4(S0[row_S0][column_S0] + S1[row_S1][column_S1])
 
 def Fk(key, block):
-    left  = key[:len(key)//2]
-    right = key[len(key)//2:]
+    left = block[:4]
+    right = block[4:]
 
     f_result = F(key, right)
     left_result = []
     for i in range(len(left)):
-        left_result = left_result + [exclusive_or(right, f_result)]
+        left_result = left_result + [exclusive_or(left[i], f_result[i])]
 
-    block = left_result + right
-    
-    return block
+    return left_result + right
 
 def SW(block):
-    left_half = block[:4]
-    right_half = block[4:]
-
-    swapped_block = right_half + left_half
-
-    return swapped_block
+    return block[4:] + block[:4]
 
 # Original 10-bit key
 key = ["1","0","1","0","0","0","0","0","1","0"]
 # Original 8-bit block
 block = ["1","1","0","1","0","1","1","1"]
-
 # The two subkeys generated
 k1, k2 = s_des_generation_keys(key)
 
-print(f'Chave K1: {k1}')
-print(f'Chave K2: {k2}')
-print(f'Bloco: {block}')
-print(f'texto cifrado: {FP(Fk(k2, SW(Fk(k1 ,IP(block)))))}')
-print(f'texto em claro: {FP(Fk(k1, SW(Fk(k2 ,IP(block)))))}')
+cipher_text = FP(Fk(k2, SW(Fk(k1, IP(block)))))
+plain_text = FP(Fk(k1, SW(Fk(k2, IP(cipher_text)))))
+
+print(f'Key K1: {k1}, Key K2: {k2}')
+print(f'Cipher Text: {cipher_text}')
+if plain_text == block:
+    print(f'Success! The decryption was successful, and the original block matches the decrypted plaintext.')
+else:
+    print(f'Error: The decryption failed. The original block does not match the decrypted plaintext.')
