@@ -1,38 +1,38 @@
-## Organização do Projeto
+## Project Structure
 
-O código da implementação do S-DES estão na pasta com caminho: src/   
-A documentação está na mesma pasta em formato notebook jupyther com nome: notebook.ipynb
+S-DES implementation code is located in the src directory.
+The documentation is in the same directory, in a Jupyter Notebook named notebook.ipynb.
 
-Você pode rodar o notebook Jupyter diretamente com o comando:
+You can run the Jupyter Notebook using the following command:
 
     jupyter notebook
 
-Ou utilizando a extensão do VSCode ou da sua IDE em questão.
+Or by using the VSCode extension or the plugins available in your current IDE.
 
-## Pré-requisitos
+## Prerequisites
 
-Antes de rodar o projeto, é recomendado criar um ambiente virtual para gerenciar as dependências do Python de forma isolada.
+Before running the project, it's recommended to create a virtual environment to manage Python dependencies in an isolated manner.
 
-### Criando um ambiente virtual
+### Creating a Virtual Environment
 
-Se ainda não tiver o virtualenv instalado, você pode instalá-lo com o seguinte comando:
+If you don't already have virtualenv installed, you can install it with the following command:
 
     pip install virtualenv
 
-Agora, crie e ative o ambiente virtual. Execute o comando abaixo para criar o ambiente:
+Now, create the virtual environment by running the following command:
 
     virtualenv .venv
 
-Depois de criar o ambiente, ative-o com o comando:
+After that activate the environment with:
 
     source .venv/bin/activate
 
-### Instalando dependências
+### Installing Dependencies
 
-Com o ambiente virtual ativado, instale as dependências do projeto utilizando o arquivo requirements.txt.
+With the virtual environment activated, install the project's dependencies using the requirements.txt file.
 
-Para isso, execute o seguinte comando:
+For that, run the following command:
 
     pip install -r requirements.txt
 
-Após a instalação, todas as dependências necessárias estarão disponíveis para rodar o projeto.
+After installation, all the necessary dependencies will be available to run the project.
