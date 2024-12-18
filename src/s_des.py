@@ -1,46 +1,81 @@
-def P_10(key):
-    """
-    Performs the P10 permutation on a 10-bit key.
-    """
-    return [key[2], key[4], key[1], key[6], key[3], key[9], key[0], key[8], key[7], key[5]]
+from key_genaration import s_des_generation_keys
 
-def circular_left_shift(key):
+S0 = [["01","00","11","10"], ["11","10","01","00"], ["00","10","01","11"], ["11","01","11","10"]]
+S1 = [["00","01","10","11"], ["10","00","01","11"], ["11","00","01","00"], ["10","01","00","11"]]
+
+def binary_to_decimal(n):
+    decimal = 0
+    for i, bit in enumerate(reversed(n)):
+        decimal += int(bit) * (2 ** i) 
+
+    return decimal
+
+def exclusive_or(n0, n1):
+    if(n0 == n1):
+        return "0"
+    else:
+        return "1"
+
+def IP(block):
+    return[block[1], block[5], block[2], block[0], block[3], block[7], block[4], block[6]]
+
+def FP(block):
+    return[block[3], block[0], block[2], block[4], block[6], block[1], block[7], block[5]]
+
+def EP(key, block):
+    return[exclusive_or(block[3], key[0]), exclusive_or(block[0], key[1]), exclusive_or(block[1], key[2]), exclusive_or(block[2], key[3]), 
+           exclusive_or(block[1], key[4]), exclusive_or(block[2], key[5]), exclusive_or(block[3], key[6]), exclusive_or(block[0], key[7])]
+
+def P_4(block):
     """
-    Performs a circular left shift (LS-1) on both halves of a 10-bit key.
+    Performs the P8 permutation on a 4-bit block.
     """
+    return block[1]+block[3]+block[2]+block[0]
+
+def F(key,block):
+    block = EP(key, block)
+
+    row_S0 = (binary_to_decimal(block[0]))+(binary_to_decimal(block[3]))
+    column_S0 = (binary_to_decimal(block[1]))+(binary_to_decimal(block[2]))
+
+    row_S1 = (binary_to_decimal(block[4]))+(binary_to_decimal(block[7]))
+    column_S1 = (binary_to_decimal(block[5]))+(binary_to_decimal(block[6]))
+    
+    block_p4 = P_4(S0[row_S0][column_S0] + S1[row_S1][column_S1])
+    
+    return block_p4
+
+def Fk(key, block):
     left  = key[:len(key)//2]
     right = key[len(key)//2:]
 
-    left = left[1:] + left[:1]
-    right = right[1:] + right[:1]
+    f_result = F(key, right)
+    left_result = []
+    for i in range(len(left)):
+        left_result = left_result + [exclusive_or(right, f_result)]
 
-    return left+right
+    block = left_result + right
+    
+    return block
 
-def P_8(key):
-    """
-    Performs the P8 permutation on a 10-bit key.
-    """
-    return [key[5], key[2], key[6], key[3], key[7], key[4], key[9], key[8]]
+def SW(block):
+    left_half = block[:4]
+    right_half = block[4:]
 
-def s_des_generation_keys(key):
-    """
-    Generates the K1 and K2 keys for the S-DES encryption algorithm.
-    """
-    key_P10 = P_10(key)
-    key_P10 = circular_left_shift(key_P10)
-    k1 = P_8(key_P10)
+    swapped_block = right_half + left_half
 
-    key_P10 = circular_left_shift(key_P10)
-    key_P10 = circular_left_shift(key_P10)
-    k2 = P_8(key_P10)
-
-    return k1, k2
+    return swapped_block
 
 # Original 10-bit key
-key = [1,0,1,0,0,0,0,0,1,0]
+key = ["1","0","1","0","0","0","0","0","1","0"]
+# Original 8-bit block
+block = ["1","1","0","1","0","1","1","1"]
 
 # The two subkeys generated
 k1, k2 = s_des_generation_keys(key)
 
 print(f'Chave K1: {k1}')
 print(f'Chave K2: {k2}')
+print(f'Bloco: {block}')
+print(f'texto cifrado: {FP(Fk(k2, SW(Fk(k1 ,IP(block)))))}')
+print(f'texto em claro: {FP(Fk(k1, SW(Fk(k2 ,IP(block)))))}')
